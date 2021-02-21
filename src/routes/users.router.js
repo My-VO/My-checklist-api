@@ -11,6 +11,13 @@ const { request, response } = require("express");
 
 const usersRouter = express.Router();
 
+usersRouter.get("/user/me", authMid.authenticateJWT, async (request, response) => {
+    const user = await usersController.getUserById(request.user.userId);
+
+    response.status(OK);
+    response.json({ token: authMid.generateToken(user), user });
+});
+
 usersRouter.post("/signup", async (request, response) => {
     const { firstName, lastName, email } = request.body;
 

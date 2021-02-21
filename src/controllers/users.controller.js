@@ -39,6 +39,9 @@ const usersController = {
     authenticate: async (data) => {
         const { email, password } = data;
 
+
+        console.log("email : ", email)
+
         const findUserByEmail = await Users.findOne({
             where : { email },
         });
@@ -65,6 +68,14 @@ const usersController = {
         const findUserByEmailDTO = await userDTO.convert2DTO(findUserByEmail);
 
         return findUserByEmailDTO;
+    },
+
+    getUserById: async (userId) => {
+        const findUser = await Users.findByPk(userId);
+
+        const findUserDTO = await userDTO.convert2DTO(findUser);
+
+        return findUserDTO;
     }
 }
 
