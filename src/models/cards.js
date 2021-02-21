@@ -1,34 +1,33 @@
 module.exports = (sequelize, DataTypes) => {
-  const Users = sequelize.define(
-    "Users",
+  const Cards = sequelize.define(
+    "Cards",
     {
-      userId: {
-        field: "user_id",
+      cardId: {
+        field: "card_id",
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      firstName: {
-        field: "first_name",
+      listId: {
+        field: "list_id",
+        allowNull: false,
+        type: DataTypes.INTEGER,
+      },
+      cardName: {
+        field: "card_name",
         allowNull: false,
         type: DataTypes.STRING,
       },
-      lastName: {
-        field: "last_name",
+      cardOrder: {
+        field: "card_order",
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
       },
-      email: {
+      description: {
+        field: "description",
         allowNull: false,
-        type: DataTypes.STRING,
-        validate: {
-          isEmail: true,
-        },
-      },
-      password: {
-        allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
       },
       createdAt: {
         field: "created_at",
@@ -50,12 +49,19 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "Users",
+      tableName: "Cards",
     }
   );
 
-  Users.associate = (models) => {
+  Cards.associate = (models) => {
+    Cards.belongsTo(models.Lists, {
+      onDelete: "CASCADE",
+      foreignKey: {
+        name: "listId",
+        allowNull: false,
+      },
+    });
   };
 
-  return Users;
+  return Cards;
 };
