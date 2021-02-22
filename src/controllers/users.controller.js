@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 
-const { Users } = require("../models");
+const { Users, Boards, sequelize } = require("../models");
 const { userDTO } = require("../dto");
 
 const ConflictError = require("../helpers/errors/conflict_error");
@@ -24,23 +24,44 @@ const usersController = {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await Users.create({
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword,
-        });
+        let transaction;
 
-        const newUserDTO = await userDTO.convert2DTO(newUser)
+        try {
+            transaction = await sequelize.transaction();
 
-        return newUserDTO;
+            const newUser = await Users.create(
+                {
+                    firstName,
+                    lastName,
+                    email,
+                    password: hashedPassword,
+                },
+                { transaction }
+            );
+    
+            const newBoard = await Boards.create(
+                {
+                    userId: newUser.dataValues.userId,
+                    boardName: "To do list"
+                },
+                { transaction }
+            );
+    
+            await transaction.commit();
+    
+            const confirmedUserDTO = await userDTO.convert2DTO(newUser, newBoard);
+    
+            return confirmedUserDTO;
+        } catch (err) {
+            if(transaction) {
+                await transaction.rollback()
+            }
+            console.log("Err : ", err)
+        }
     },
 
     authenticate: async (data) => {
         const { email, password } = data;
-
-
-        console.log("email : ", email)
 
         const findUserByEmail = await Users.findOne({
             where : { email },
@@ -65,7 +86,16 @@ const usersController = {
             );
         }
 
-        const findUserByEmailDTO = await userDTO.convert2DTO(findUserByEmail);
+        const { userId } = findUserByEmail.dataValues;
+
+        const findBoardByUser = await Boards.findOne({
+            attributes: ["boardId", "boardName"],
+            where: {
+                userId,
+            }
+        })
+
+        const findUserByEmailDTO = await userDTO.convert2DTO(findUserByEmail, findBoardByUser);
 
         return findUserByEmailDTO;
     },

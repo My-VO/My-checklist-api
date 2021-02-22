@@ -9,6 +9,8 @@ const accessTokenSecret = process.env.JWT_SIGN_SECRET;
 
 module.exports = {
     generateToken: (userData) => {
+console.log("userData :", userData)
+
         return jwt.sign(
             {
                 userId: userData.id,

@@ -4,6 +4,7 @@ require("express-async-errors");
 
 const mainRouter = express.Router();
 const usersRouter = require("./users.router");
+const checklistRouter = require("./checklist.router");
 
 mainRouter.get("/", (request, response) => {
     response.status(OK);
@@ -11,5 +12,6 @@ mainRouter.get("/", (request, response) => {
 });
 
 mainRouter.use(usersRouter);
+mainRouter.use(checklistRouter);
 
 module.exports = mainRouter;

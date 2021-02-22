@@ -7,7 +7,6 @@ const { OK, CREATED } = require("../helpers/status_code");
 const BadRequestError = require("../helpers/errors/bad_request_error");
 
 const usersController = require("../controllers/users.controller");
-const { request, response } = require("express");
 
 const usersRouter = express.Router();
 
